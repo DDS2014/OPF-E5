@@ -1,0 +1,17 @@
+-Primer refactor:
+
+En la solución propuesta, el partido se guarda un string "estado". Según ciertos eventos, setea este string y después al momento de hacer validaciones pregunta con condicionales por su valor. Esto es un ejemplo del bad smell conocido como "primitive obsession", ya que estoy utilizando un tipo de datos del lenguaje donde podría tener una abstracción útil para el modelo.
+
+La consecuencia principal es que el partido está teniendo responsabilidad de más, ya que debe preocuparse por implementar distintas acciones según el valor de "estado". Esto hace que el código sea menos modular y se concentre en una sola clase: si tengo que cambiar cómo se comporta algún estado o agregar algún estado nuevo, tengo que encontrar la línea específica en el partido. Además, la solución propuesta es poco expresiva y para poder mantener el código hay que acordarse que "A" es abierto, "C" es cerrado, etc etc.
+
+El refactor propuesto es reificar el estado del partido y cambiar todos los "if estado == ..." por mensajes al estado. Esto nos permite eliminar algunos condicionales, reemplazándolos por una sola sentencia, y nos da la posibilidad de poder usar el partido sin que se entere cuál es su estado. El estado pasa a ser un objeto aparte, y se puede agregar cualquier cantidad de nuevos estados sin que eso tenga consecuencias en el partido.
+
+
+-Segundo refactor:
+
+En el partido se utilizan valores de retorno para representar condiciones de error. Esto nos hace un poco de ruido porque sugiere que no se está aprovechando bien el mecanismo de excepciones que ofrece Java.
+
+En efecto, generarEquipos llama a validarInscripción y, si devolvió -1, lanza una BusinessException. Esto es mala idea porque, si tuviera que manejar otro tipo de errores, tendría que agrandar ese if, lo que quita mantenibilidad. Además, el mensaje de la excepción es muy poco informativo ("hubo un error").
+
+Aprovechando que validarInscripción es un método nuestro, el refactor lógico es reemplazar todos los "return -1" por "throw new BusinesException(msj)" donde, para cada caso, se incluya un mensaje un poquito más útil de lo que pasó. Así, no necesito preguntar qué retorno validarInscripción, sino que dejo que levante la excepción que requiera. Pasa a ser un método que retorna void. Si se incluyeran nuevas validaciones que el "hubo un error" que está representando el -1, el partido no se entera. Observar también que el partido tampoco necesita saber que se está levantando una excepción, pero por cómo funciona el mecanismo de excepciones, la funcionalidad no cambia: los objetos que llamen al partido van a recibir la excepción por parte del partido como antes del refactor. El código del método generarEquipos() queda mucho más corto y va directo a lo que le importa.
+
