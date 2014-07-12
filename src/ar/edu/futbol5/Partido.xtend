@@ -11,13 +11,13 @@ class Partido {
 	@Property List<Jugador> inscriptos
 	@Property Equipo equipo1
 	@Property Equipo equipo2
-	String estado
+	PartidoState estado
 	@Property CriterioOrdenamiento criterioOrdenamiento
 	@Property int distribucionEquipos // 5 es par/impar, 16 = 1,4,5,8,9 vs. 2,3,6,7,10
 
 	new() {
 		inscriptos = new ArrayList<Jugador>
-		estado = "A"
+		estado = new PartidoAbierto_State()
 		distribucionEquipos = 5 // par/impar
 		criterioOrdenamiento = new OrdenamientoPorHandicap
 	}
@@ -27,19 +27,17 @@ class Partido {
 			throw new BusinessException("Hubo un error")
 		}
 		this.distribuirEquipos(this.ordenarEquipos)
-		estado = "G"
+		estado = new PartidoGenerado_State()
 	}
 
 	def validarInscripcion() {
 		if (inscriptos.size < 10) {
 			return -1
 		}
-		if (estado.equalsIgnoreCase("A")) {
+		if (!estado.permiteInscripciones()) {
 			return -1
 		}
-		if (estado.equalsIgnoreCase("G")) {
-			return -1
-		}
+		
 		return 0
 	}
 
@@ -90,6 +88,6 @@ class Partido {
 	}
 
 	def void cerrar() {
-		estado = "C"
+		estado = new PartidoCerrado_State()
 	}
 }
