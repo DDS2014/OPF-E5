@@ -23,22 +23,14 @@ class Partido {
 	}
 
 	def generarEquipos() {
-		if (this.validarInscripcion == -1) {
-			throw new BusinessException("Hubo un error")
-		}
+		this.validarInscripcion()
 		this.distribuirEquipos(this.ordenarEquipos)
 		estado = new PartidoGenerado_State()
 	}
 
 	def validarInscripcion() {
-		if (inscriptos.size < 10) {
-			return -1
-		}
-		if (!estado.permiteInscripciones()) {
-			return -1
-		}
-		
-		return 0
+		if (inscriptos.size < 10) throw new BusinessException("No hay suficientes jugadores inscriptos como para generar los equipos")
+		if (!estado.permiteInscripciones()) throw new BusinessException("El partido no se encuentra en un estado que permita generar los equipos")
 	}
 
 	def distribuirEquipos(List<Jugador> jugadores) {
