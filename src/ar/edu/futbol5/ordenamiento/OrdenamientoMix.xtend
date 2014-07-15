@@ -1,6 +1,6 @@
 package ar.edu.futbol5.ordenamiento
 
-import ar.edu.futbol5.Partido
+
 import java.util.ArrayList
 import java.util.List
 
@@ -11,10 +11,7 @@ class OrdenamientoMix extends CriterioOrdenamiento {
 	new() {
 		criterios = new ArrayList<CriterioOrdenamiento>
 	}
-	
-	override ordenar(Partido partido) {
-		partido.inscriptos.sortBy(calcularValor()).clone.reverse
-	}
+
 	
 	def addCriterio(CriterioOrdenamiento criterio) {
 		criterios.add(criterio)
