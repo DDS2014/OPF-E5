@@ -5,6 +5,8 @@ import ar.edu.futbol5.ordenamiento.CriterioOrdenamiento
 import ar.edu.futbol5.ordenamiento.OrdenamientoPorHandicap
 import java.util.ArrayList
 import java.util.List
+import ar.edu.futbol5.distribucion.ModoDistribucion
+import ar.edu.futbol5.distribucion.DistribucionParImpar
 
 class Partido {
 
@@ -13,12 +15,12 @@ class Partido {
 	@Property ArrayList<Jugador> equipo2
 	PartidoState estado
 	@Property CriterioOrdenamiento criterioOrdenamiento
-	@Property int distribucionEquipos // 5 es par/impar, 16 = 1,4,5,8,9 vs. 2,3,6,7,10
+	@Property ModoDistribucion distribucionEquipos
 
 	new() {
 		inscriptos = new ArrayList<Jugador>
 		estado = new PartidoAbierto_State()
-		distribucionEquipos = 5 // par/impar
+		distribucionEquipos = new DistribucionParImpar() // par/impar
 		criterioOrdenamiento = new OrdenamientoPorHandicap
 	}
 
@@ -33,21 +35,9 @@ class Partido {
 		if (!estado.permiteInscripciones()) throw new BusinessException("El partido no se encuentra en un estado que permita generar los equipos")
 	}
 
-	def distribuirEquipos(List<Jugador> jugadores) {
-
-		if (distribucionEquipos == 5) {
-			equipo1 = newArrayList(jugadores.get(0), jugadores.get(2), jugadores.get(4), jugadores.get(6),
-				jugadores.get(8))
-			equipo2 = newArrayList(jugadores.get(1), jugadores.get(3), jugadores.get(5), jugadores.get(7),
-				jugadores.get(9))
-		} else {
-
-			// distribucionEquipos == 16 que ordena de esta manera
-			equipo1 = newArrayList(jugadores.get(0), jugadores.get(3), jugadores.get(4), jugadores.get(7),
-				jugadores.get(8))
-			equipo2 = newArrayList(jugadores.get(1), jugadores.get(2), jugadores.get(5), jugadores.get(6),
-				jugadores.get(9))
-		}
+	def distribuirEquipos(List<Jugador> jugadores) 
+	{
+		this.distribucionEquipos.distribuirJugadores(this, jugadores);
 	}
 
 	def List<Jugador> ordenarEquipos() {
