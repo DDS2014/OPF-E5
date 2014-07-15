@@ -15,3 +15,11 @@ En efecto, generarEquipos llama a validarInscripción y, si devolvió -1, lanza un
 
 Aprovechando que validarInscripción es un método nuestro, el refactor lógico es reemplazar todos los "return -1" por "throw new BusinesException(msj)" donde, para cada caso, se incluya un mensaje un poquito más útil de lo que pasó. Así, no necesito preguntar qué retorno validarInscripción, sino que dejo que levante la excepción que requiera. Pasa a ser un método que retorna void. Si se incluyeran nuevas validaciones que el "hubo un error" que está representando el -1, el partido no se entera. Observar también que el partido tampoco necesita saber que se está levantando una excepción, pero por cómo funciona el mecanismo de excepciones, la funcionalidad no cambia: los objetos que llamen al partido van a recibir la excepción por parte del partido como antes del refactor. El código del método generarEquipos() queda mucho más corto y va directo a lo que le importa.
 
+
+-Tercer refactor:
+
+En todas las implementaciones de "CriterioOrdenamiento" aparece el mismo código para el método "ordenar". Es decir, el código está repetido en las tres clases que lo implmenentan.
+
+Esto demuestra que tenemos un comportamiento común a todos los criterios de ordenamiento y no lo estamos reconociendo como tal. En este caso, si quisieramos cambiar la forma de ordenar, tendríamos que tocar las N clases que implementen esta interfaz, dificultando la modificación del código. Además, la posibilidad de olvidarse de alguna clase al hacer tal cambio pone en peligro la consistencia del comportamiento esperado.
+
+El refactor propuesto es convertir la interfaz "CriterioOrdenamiento" en clase abstracta, para poder ubicar ahí el código que comparten las implementaciones (que pasan ahora a ser subclases).
